@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-messages.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            font: 10px sans-serif;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+
+        .bar {
+            fill: orange;
+        }
+
+        .bar:hover {
+            fill: orangered ;
+        }
+
+        .x.axis path {
+            display: none;
+        }
+
+        .d3-tip {
+            line-height: 1;
+            font-weight: bold;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border-radius: 2px;
+        }
+
+        /* Creates a small triangle extender for the tooltip */
+        .d3-tip:after {
+            box-sizing: border-box;
+            display: inline;
+            font-size: 10px;
+            width: 100%;
+            line-height: 1;
+            color: rgba(0, 0, 0, 0.8);
+            content: "\25BC";
+            position: absolute;
+            text-align: center;
+        }
+
+        /* Style northward tooltips differently */
+        .d3-tip.n:after {
+            margin: -1px 0 0 0;
+            top: 100%;
+            left: 0;
+        }
+    </style>
+</head>
+<body ng-app = "two" ng-controller = "control as three">
+<md-toolbar class="md-warn">
+    <div class="md-toolbar-tools">
+        <h2 class="md-flex">Visualisation</h2>
+    </div>
+</md-toolbar>
+<div layout="row" layout-padding class="bg-dark-blue nav-dark nav" layout-align="space-between center">
+    <div>
+
+        <md-menu>
+            <md-button class="md-raised md-warn" md-menu-origin ng-click="$mdOpenMenu()">Navigation</md-button>
+            <md-menu-content width="2">
+                <md-menu-item>
+                    <md-button href = "sort.html">Bubble Sort</md-button>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button href = "merge.html">QuickSort</md-button>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button href = "heap.html">Heap Sort</md-button>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button href = "file2.html">Linear Probing</md-button>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button href = "file3.html">Double hashing</md-button>
+                </md-menu-item>
+            </md-menu-content>
+        </md-menu>
+    </div>
+</div>
+    <div id = "graph"></div>
+<md-input-container class = "md-warn">
+    <input type = "text" ng-model = "three.number" placeholder='Sorting size' ng-disabled = "three.disable">
+</md-input-container>
+<md-button ng-click="three.sort()"> Sort </md-button>
+<script>
+    angular.module("two", ['ngMaterial']).controller("control", function($timeout, $interval, $scope)
+    {
+        var ctrl = this;
+        ctrl.number = 200;
+        var obj = this;
+        obj.done = true;
+        var total = 0;
+        var i = 0;
+        var z = 0;
+        var temp_arr = [];
+        var snap = 0;
+
+        function buildHeap()
+        {
+            var index;
+            data.splice(0, 0, 0);
+            for (index = Math.floor((data.length-1)/2); index> 0; index--)
+            {
+                heapifyDown(index);
+            }
+        }
+        function heapifyUp(index)
+        {
+            if (index <= 1)
+            {
+                temp_arr.push(data2.concat(data.slice(1)));
+                return;
+            }
+            var parent = Math.floor(index / 2);
+            if (data[parent].value > data[index].value)
+            {
+                var temp2 = data[parent];
+                data[parent] = data[index];
+                data[index] = temp2;
+                heapifyUp(parent);
+            }
+        }
+        function heapifyDown(index)
+        {
+            if (index * 2 >= data.length)
+            {
+                temp_arr.push(data2.concat(data.slice(1)));
+                return;
+            }
+            if (index * 2 + 1 >= data.length)
+            {
+                if (data[index].value > data[index*2].value)
+                {
+                    temp_arr.push(data2.concat(data.slice(1)));
+                    var temp2 = data[index];
+                    data[index] = data[index * 2];
+                    data[index * 2] = temp2;
+                    heapifyDown(index * 2);
+                }
+                return;
+            }
+            else
+            {
+                var smallest;
+                if (data[index*2].value < data[index*2+1].value)
+                {
+                    smallest = index*2;
+                }
+                else
+                {
+                    smallest = index*2+1
+                }
+                if (data[index].value > data[smallest].value)
+                {
+                    temp_arr.push(data2.concat(data.slice(1)));
+                    var temp2 = data[index];
+                    data[index] = data[smallest];
+                    data[smallest] = temp2;
+                    heapifyDown(smallest);
+                }
+            }
+        }
+        function removeMin()
+        {
+            var value = data[1];
+            data[1] = data[data.length-1];
+            data.pop();
+            data2.push(value);
+            heapifyDown(1);
+        }
+        var data2 = [];
+
+        function heapSort()
+        {while(data.length > 1)
+            {
+                removeMin();
+            }
+            data = data2;
+        }
+
+
+        var data = [];
+        function make() {
+            for (i = 0; i < ctrl.number; i++) {
+                data.push({letter: i.toString(), value: Math.floor(Math.random() * ctrl.number + 1)})
+            }
+        }
+
+        function draw(data){
+            var margin = {top: 40, right: 20, bottom: 30, left: 40},
+                    width = 960 - margin.left - margin.right,
+                    height = 500 - margin.top - margin.bottom;
+
+            var formatPercent = d3.format("1s");
+
+            var x = d3.scale.ordinal()
+                    .rangeRoundBands([0, width], .1);
+
+            var y = d3.scale.linear()
+                    .range([height, 0]);
+
+            var xAxis = d3.svg.axis()
+                    .scale(x)
+                    .orient("bottom")
+                    .tickFormat("");
+
+            var yAxis = d3.svg.axis()
+                    .scale(y)
+                    .orient("left")
+                    .tickFormat(formatPercent);
+
+            var tip = d3.tip()
+                    .attr('class', 'd3-tip')
+                    .offset([-10, 0])
+                    .html(function(d) {
+                        return "<strong>Value:</strong> <span style='color:red'>" + d.value + "</span>";
+                    })
+
+            var svg = d3.select("#graph").append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            svg.call(tip);
+
+            x.domain(data.map(function(d) { return d.letter; }));
+            y.domain([0, d3.max(data, function(d) { return d.value; })]);
+
+            svg.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(xAxis);
+
+            svg.append("g")
+                    .attr("class", "y axis")
+                    .call(yAxis)
+                    .append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 6)
+                    .attr("dy", ".71em")
+                    .style("text-anchor", "end")
+                    .text("Value");
+
+            svg.selectAll(".bar")
+                    .data(data)
+                    .enter().append("rect")
+                    .attr("class", "bar")
+                    .attr("x", function(d) { return x(d.letter); })
+                    .attr("width", x.rangeBand())
+                    .attr("y", function(d) { return y(d.value); })
+                    .attr("height", function(d) { return height - y(d.value); })
+                    .on('mouseover', tip.show)
+                    .on('mouseout', tip.hide)
+
+
+            function type(d) {
+                d.value = +d.value;
+                return d;
+            }
+        }
+
+        this.sort = function() {
+            make();
+            ctrl.disable = true;
+            ctrl.time = 0;
+            var start = new Date().getTime();
+            buildHeap()
+            heapSort()
+
+            var promise = $interval(function () {
+                if (snap < temp_arr.length) {
+                    document.getElementById("graph").innerHTML = '';
+                    draw(temp_arr[snap++]);
+                    var end = new Date().getTime();
+                    ctrl.time = (end - start) / 1000;
+                    document.getElementById("graph").innerHTML += ctrl.time + 's';
+                }
+                else {
+                    $interval.cancel(promise);
+                }
+            }, 50)
+        };
+    });
+</script>
+</body>
+</html>

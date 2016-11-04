@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
+      <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-messages.min.js"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
+	 <link rel="stylesheet" href="style.css">
+   	 <meta charset="UTF-8">
+   	 <title>Title</title>
+</head>
+<body ng-app = "one" ng-controller = "two as three">
+<md-toolbar class="md-warn">
+    <div class="md-toolbar-tools">
+        <h2 class="md-flex">Visualisation</h2>
+    </div>
+</md-toolbar>
+<div layout="row" layout-padding class="bg-dark-blue nav-dark nav" layout-align="space-between center">
+    <div>
+
+        <md-menu>
+            <md-button class="md-raised md-warn" md-menu-origin ng-click="$mdOpenMenu()">Navigation</md-button>
+            <md-menu-content width="2">
+                <md-menu-item>
+                    <md-button href = "sort.html">Bubble Sort</md-button>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button href = "merge.html">QuickSort</md-button>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button href = "heap.html">Heap Sort</md-button>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button href = "file2.html">Linear Probing</md-button>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button href = "file3.html">Double hashing</md-button>
+                </md-menu-item>
+            </md-menu-content>
+        </md-menu>
+    </div>
+</div>
+
+    <table style = "height:590px; width:950px;">
+        <tr ng-repeat = "row in three.helper">
+            <td ng-repeat = "col in three.container">
+                <span style = "border:1px solid; font-weight:bold; padding-left:4px;">&times </span>
+                <span style = "border:1px solid; display:inline-block; height:18px; width:28px;" ng-hide = "col[row] <= 0"> &#160&#160&#160&#160&#160&#160</span>
+                <span style = "border:1px solid; border-radius: 2px; display:inline-block;width:28px;height:18px;text-align:center;" ng-show = "col[row] <= 0" ng-style ="{'background-color' : ($index * 23 + row== three.coord)? 'aqua':'orange'}">{{-1 * col[row] + 1}}</span>
+            </td>
+        </tr>
+    </table>
+	Time to Execute : {{three.time}} seconds</br>
+    &alpha; : {{(three.z / 349 * 100).toFixed(1)}} %
+
+
+	<md-button ng-click="three.lprobe()"> Probe </md-button>
+	<script>
+		angular.module("one", ['ngMaterial']).controller("two", function($mdSidenav, $timeout, $interval, $scope){
+			var ctrl = this;
+			this.count = 0;
+			this.time = 0;
+			this.cont = [];
+			this.container = [];
+			this.helper = [];
+			var i;
+			for (i = 0; i < 23; i++)
+			{
+				this.helper.push(i);
+			}
+			for (i = 1; i < 350; i++)
+			{
+				this.cont.push(i);
+			}
+
+			while(this.cont.length > 0)
+			{
+				var temp = this.cont.splice(0, 23);
+				this.container.push(temp);
+			}
+			var length = this.container.length;
+			function random()
+			{
+				return Math.floor(Math.random() * 349);
+			}
+
+			ctrl.z = 0;
+            ctrl.trigger = 1;
+            var obj = this;
+            obj.running = 1;
+			var swear = function loop(start, container){
+                if (ctrl.z>= 349) {
+                    return;
+                }
+				var no = random();
+                obj.bool = 1;
+                    if (ctrl.trigger) {
+                        function name(no, ran) {
+                            $timeout(function() {
+                                if (obj.bool && (obj.running || ran)) {
+                                    ctrl.trigger = 0;
+                                    obj.running = 0;
+                                    var row = Math.floor(no / 23);
+                                    var col = no % 23;
+                                    if (ctrl.container[row][col] > 0 && obj.bool) {
+                                        ctrl.container[row][col] = -1 * ctrl.z;
+                                        ctrl.z++;
+                                        ctrl.coord = no;
+                                        obj.bool = 0;
+                                        ctrl.trigger = 1;
+                                        obj.running = 1;
+                                    }
+                                    ctrl.coord = no;
+                                    no = (no + 1) % 349;
+                                    if (obj.bool) {
+                                        name(no, 1);
+                                    }
+                                }
+                            }, 20)
+                        }
+                        name(no, 0);
+                }
+				var end = new Date().getTime();
+				ctrl.time = (end- start)/1000;
+				console.log(ctrl.time)
+                $timeout(function(){loop(start, container);}, 50);
+				};
+			this.lprobe = function(){
+				var start = new Date().getTime();
+				swear(start, this.container);
+				};
+            function sleep(miliseconds) {
+                var currentTime = new Date().getTime();
+
+                while (currentTime + miliseconds >= new Date().getTime()) {
+                }
+            }
+
+        }
+	);
+	</script>
+</body>
+</html>

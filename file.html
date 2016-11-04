@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
+      <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-messages.min.js"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
+	 <link rel="stylesheet" href="style.css">
+   	 <meta charset="UTF-8">
+   	 <title>Title</title>
+</head>
+<body ng-app = "one" ng-controller = "two as three">
+	 <md-toolbar class="md-warn">
+         <div class="md-toolbar-tools">
+            <h2 class="md-flex">Pi Test</h2>
+        </div>
+     </md-toolbar>   
+	
+	<div layout="row">
+  		<md-sidenav md-component-id="left" class="md-sidenav-left">
+   			<div class = "md-title high">
+				<md-toolbar class= "md-warn" style = "padding-top : 20px">
+					High Score
+				</md-toolbar>
+				<br>
+					<table id = "table7">
+						<tr ng-repeat = "x in three.highscore | orderBy:'':true">
+							<td>{{x}}</td>
+						</tr>
+					</table>
+			</div>
+ 		 </md-sidenav>
+ 		 <md-content>
+    		<md-button class = "md-warn md-cornered" ng-click="three.openLeftMenu()">
+ 				High Score
+			</md-button>
+  		</md-content>
+	</div>
+
+	<br>
+    <md-tooltip md-visible="three.counter >= 3" md-direction="bottom" class = "md-title"style = "height : 800px; margin-left : -2%;">Game Over</md-tooltip>
+    <md-input-container class = "md-warn" style = "margin-left : 40%">
+        	<input type = "text" ng-model = "three.pi2" ng-change = "three.check()" placeholder='Pi'> 
+	</md-input-container>
+	<span id = "sc">Score: {{three.length}}</span>
+	<md-button class = "md-raised md-warn" ng-click = "three.reset()" id = 'button'>Reset
+	</md-button>
+	<div class = "test">
+		<span ng-show = "three.counter >= 1">X</span>
+		<span ng-show = "three.counter >= 2">X</span>
+		<span ng-show = "three.counter >=3">X</span>
+	</div>
+	<br>
+		<script>
+		angular.module("one", ['ngMaterial']).controller("two", function($mdSidenav){
+			this.highscore = [];
+			this.pi = Math.PI.toString();
+			this.counter = 0;
+			this.old = "";
+			this.length = 0;
+			this.check = function(){
+				var str = this.pi2.toString();
+				this.length = str.length;
+				if (str.length <= this.old.length)
+				{
+					this.old = str;
+					return;
+				}	
+				this.old = str;
+				var x;
+				for (x = 0; x < str.length; x++)
+				{
+					if (this.pi[x] != str[x])
+					{
+					this.counter++;
+					if (this.counter == 3)
+					{
+						this.highscore.push(str.length);
+					}
+					break;
+					}
+				}
+			};
+			this.reset = function(){
+				this.counter = 0;
+				this.pi2 = "";
+			};
+			this.openLeftMenu = function(){
+				$mdSidenav('left').toggle();
+			};
+			this.openRightMenu = function(){
+				$mdSidenav('right').toggle();
+			};
+		});
+	</script>
+</body>
+</html>
